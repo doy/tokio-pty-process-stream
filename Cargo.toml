@@ -4,6 +4,13 @@ version = "0.1.0"
 authors = ["Jesse Luehrs <doy@tozt.net>"]
 edition = "2018"
 
+description = "wraps tokio-pty-process in order to provide a simpler API as a single stream object"
+license = "MIT"
+repository = "https://git.tozt.net/tokio-pty-process-stream"
+readme = "README.md"
+keywords = ["pty", "futures"]
+categories = ["asynchronous"]
+
 [dependencies]
 component-future = "0.1"
 futures = "0.1"

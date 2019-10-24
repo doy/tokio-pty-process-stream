@@ -138,9 +138,12 @@
 //! # }
 //! ```
 
+// XXX this is broken with ale
+// #![warn(clippy::cargo)]
 #![warn(clippy::pedantic)]
 #![warn(clippy::nursery)]
 #![allow(clippy::missing_const_for_fn)]
+#![allow(clippy::multiple_crate_versions)]
 #![allow(clippy::type_complexity)]
 
 use futures::future::Future as _;
