@@ -278,6 +278,15 @@ impl<R: tokio::io::AsyncRead + 'static> Process<R> {
     pub fn resize(&mut self, rows: u16, cols: u16) {
         self.needs_resize = Some((rows, cols));
     }
+
+    /// Returns a mutable reference to the input object provided in the
+    /// constructor.
+    ///
+    /// This can be useful if you are driving the input manually, rather than
+    /// just hooking it up directly to stdin.
+    pub fn input(&mut self) -> &mut R {
+        &mut self.input
+    }
 }
 
 impl<R: tokio::io::AsyncRead + 'static> Process<R> {
