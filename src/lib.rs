@@ -37,9 +37,9 @@ pub enum Error {
 
 #[derive(Debug, PartialEq, Eq)]
 pub enum Event {
-    CommandStart(String, Vec<String>),
-    Output(Vec<u8>),
-    CommandExit(std::process::ExitStatus),
+    CommandStart { cmd: String, args: Vec<String> },
+    Output { data: Vec<u8> },
+    CommandExit { status: std::process::ExitStatus },
 }
 
 struct State {
@@ -175,10 +175,10 @@ impl<R: tokio::io::AsyncRead + 'static> Process<R> {
         }
 
         self.started = true;
-        Ok(component_future::Async::Ready(Some(Event::CommandStart(
-            self.cmd.clone(),
-            self.args.clone(),
-        ))))
+        Ok(component_future::Async::Ready(Some(Event::CommandStart {
+            cmd: self.cmd.clone(),
+            args: self.args.clone(),
+        })))
     }
 
     fn poll_read_stdin(
@@ -235,7 +235,9 @@ impl<R: tokio::io::AsyncRead + 'static> Process<R> {
             Ok(futures::Async::Ready(n)) => {
                 log::debug!("read_stdout({})", n);
                 let bytes = self.buf[..n].to_vec();
-                Ok(component_future::Async::Ready(Some(Event::Output(bytes))))
+                Ok(component_future::Async::Ready(Some(Event::Output {
+                    data: bytes,
+                })))
             }
             Ok(futures::Async::NotReady) => {
                 Ok(component_future::Async::NotReady)
@@ -272,9 +274,9 @@ impl<R: tokio::io::AsyncRead + 'static> Process<R> {
             .context(ProcessExitPoll));
         log::debug!("exit({})", status);
         self.exited = true;
-        Ok(component_future::Async::Ready(Some(Event::CommandExit(
+        Ok(component_future::Async::Ready(Some(Event::CommandExit {
             status,
-        ))))
+        })))
     }
 }
 
@@ -318,7 +320,13 @@ mod test {
         let event = event.unwrap();
         let event = event.unwrap();
         let event = event.unwrap();
-        assert_eq!(event, Event::CommandStart("cat".to_string(), vec![]));
+        assert_eq!(
+            event,
+            Event::CommandStart {
+                cmd: "cat".to_string(),
+                args: vec![]
+            }
+        );
 
         let mut output: Vec<u8> = vec![];
         let mut exited = false;
@@ -327,11 +335,13 @@ mod test {
             let event = event.unwrap();
             let event = event.unwrap();
             match event {
-                Event::CommandStart(..) => panic!("unexpected CommandStart"),
-                Event::Output(buf) => {
-                    output.extend(buf.iter());
+                Event::CommandStart { .. } => {
+                    panic!("unexpected CommandStart")
                 }
-                Event::CommandExit(status) => {
+                Event::Output { data } => {
+                    output.extend(data.iter());
+                }
+                Event::CommandExit { status } => {
                     assert!(status.success());
                     exited = true;
                 }
