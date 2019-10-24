@@ -14,4 +14,6 @@ tokio-pty-process = "0.4"
 
 [dev-dependencies]
 crossterm = "0.11"
+lazy_static = "1"
 mio = "0.6"
+regex = "1"
