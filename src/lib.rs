@@ -42,7 +42,7 @@ pub enum Event {
     CommandExit(std::process::ExitStatus),
 }
 
-pub struct State {
+struct State {
     pty: Option<tokio_pty_process::AsyncPtyMaster>,
     process: Option<tokio_pty_process::Child>,
 }
