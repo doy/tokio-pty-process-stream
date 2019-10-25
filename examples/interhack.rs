@@ -10,7 +10,6 @@ struct Interhack {
     process: tokio_pty_process_stream::Process<input::buf::Stdin>,
     stdin: input::evented_stdin::Stdin,
     read_buf: [u8; 4096],
-    raw_screen: Option<crossterm::RawScreen>,
 }
 
 impl Interhack {
@@ -23,7 +22,6 @@ impl Interhack {
             ),
             stdin: input::evented_stdin::Stdin::new(),
             read_buf: [0; 4096],
-            raw_screen: None,
         }
     }
 
@@ -71,7 +69,7 @@ impl Interhack {
             &'a mut Self,
         )
             -> component_future::Poll<(), ()>] =
-        &[&Self::poll_input, &Self::poll_process, &Self::poll_screen];
+        &[&Self::poll_input, &Self::poll_process];
 
     fn poll_input(&mut self) -> component_future::Poll<(), ()> {
         let n = component_future::try_ready!(self
@@ -101,16 +99,6 @@ impl Interhack {
         }
         Ok(component_future::Async::DidWork)
     }
-
-    fn poll_screen(&mut self) -> component_future::Poll<(), ()> {
-        if self.raw_screen.is_none() {
-            self.raw_screen =
-                Some(crossterm::RawScreen::into_raw_mode().unwrap());
-            Ok(component_future::Async::DidWork)
-        } else {
-            Ok(component_future::Async::NothingToDo)
-        }
-    }
 }
 
 impl futures::future::Future for Interhack {
@@ -123,5 +111,6 @@ impl futures::future::Future for Interhack {
 }
 
 fn main() {
+    let _raw_screen = crossterm::RawScreen::into_raw_mode().unwrap();
     tokio::run(futures::future::lazy(Interhack::new));
 }
