@@ -31,6 +31,7 @@
 //!
 //! let process =
 //!     tokio_pty_process_stream::Process::new(&cmd, &args, Stdin::new());
+//! let process = tokio_pty_process_stream::ResizingProcess::new(process);
 //!
 //! let _raw = crossterm::RawScreen::into_raw_mode().unwrap();
 //! tokio::run(
@@ -49,6 +50,7 @@
 //!                 tokio_pty_process_stream::Event::CommandExit {
 //!                     ..
 //!                 } => {}
+//!                 tokio_pty_process_stream::Event::Resize { .. } => {}
 //!             }
 //!             futures::future::ok(())
 //!         })
@@ -151,3 +153,5 @@ pub use error::Error;
 mod process;
 pub use process::Event;
 pub use process::Process;
+mod resize;
+pub use resize::ResizingProcess;

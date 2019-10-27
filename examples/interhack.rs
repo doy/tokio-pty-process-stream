@@ -7,7 +7,7 @@ use tokio::io::AsyncRead as _;
 mod input;
 
 struct Interhack {
-    process: tokio_pty_process_stream::Process<input::buf::Stdin>,
+    process: tokio_pty_process_stream::ResizingProcess<input::buf::Stdin>,
     stdin: input::evented_stdin::Stdin,
     read_buf: [u8; 4096],
 }
@@ -15,10 +15,12 @@ struct Interhack {
 impl Interhack {
     fn new() -> Self {
         Self {
-            process: tokio_pty_process_stream::Process::new(
-                "nethack",
-                &[],
-                input::buf::Stdin::new(),
+            process: tokio_pty_process_stream::ResizingProcess::new(
+                tokio_pty_process_stream::Process::new(
+                    "nethack",
+                    &[],
+                    input::buf::Stdin::new(),
+                ),
             ),
             stdin: input::evented_stdin::Stdin::new(),
             read_buf: [0; 4096],

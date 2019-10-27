@@ -15,6 +15,7 @@ fn main() {
         &args,
         input::evented_stdin::Stdin::new(),
     );
+    let process = tokio_pty_process_stream::ResizingProcess::new(process);
 
     let _raw = crossterm::RawScreen::into_raw_mode().unwrap();
     tokio::run(
@@ -33,6 +34,7 @@ fn main() {
                     tokio_pty_process_stream::Event::CommandExit {
                         ..
                     } => {}
+                    tokio_pty_process_stream::Event::Resize { .. } => {}
                 }
                 futures::future::ok(())
             })

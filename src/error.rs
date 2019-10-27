@@ -22,6 +22,11 @@ pub enum Error {
     #[snafu(display("failed to resize pty: {}", source))]
     ResizePty { source: std::io::Error },
 
+    #[snafu(display("failed to poll for terminal resizing: {}", source))]
+    Resize {
+        source: tokio_terminal_resize::Error,
+    },
+
     /// failed to spawn process
     #[snafu(display("failed to spawn process for `{}`: {}", cmd, source))]
     SpawnProcess { cmd: String, source: std::io::Error },

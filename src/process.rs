@@ -20,6 +20,9 @@ pub enum Event {
 
     /// Emitted when the command has exited.
     CommandExit { status: std::process::ExitStatus },
+
+    /// Emitted by a `ResizingProcess` when a resize event happens
+    Resize { size: (u16, u16) },
 }
 
 struct State {
@@ -354,6 +357,7 @@ mod test {
                     assert!(status.success());
                     exited = true;
                 }
+                Event::Resize { .. } => {}
             }
         }
         assert!(exited);

@@ -18,6 +18,7 @@ log = "0.4"
 snafu = "0.5"
 tokio = "0.1.22"
 tokio-pty-process = "0.4"
+tokio-terminal-resize = "0.1"
 
 [dev-dependencies]
 crossterm = "0.11"
