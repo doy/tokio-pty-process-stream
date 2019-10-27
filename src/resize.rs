@@ -2,6 +2,11 @@ use futures::future::Future as _;
 use futures::stream::Stream as _;
 use snafu::futures01::StreamExt as _;
 
+/// A wrapper around `Process` which listens for terminal resize signals and
+/// propagates the changes into the process running on the pty.
+///
+/// This is useful for running subprocesses in a pty that will ultimately be
+/// displayed in the user's terminal directly.
 pub struct ResizingProcess<R: tokio::io::AsyncRead + 'static> {
     process: crate::process::Process<R>,
     resizer: Box<
@@ -13,6 +18,8 @@ pub struct ResizingProcess<R: tokio::io::AsyncRead + 'static> {
 }
 
 impl<R: tokio::io::AsyncRead + 'static> ResizingProcess<R> {
+    /// Creates a new `ResizingProcess` as a wrapper around the given
+    /// `Process` instance.
     pub fn new(process: crate::process::Process<R>) -> Self {
         Self {
             process,
@@ -24,6 +31,8 @@ impl<R: tokio::io::AsyncRead + 'static> ResizingProcess<R> {
         }
     }
 
+    /// Returns a mutable reference to the input object provided in the inner
+    /// `Process` instance's constructor.
     pub fn input(&mut self) -> &mut R {
         self.process.input()
     }
